@@ -176,27 +176,25 @@ def ingest_document(
     }
 
 def delete_file_vectors(filename: str, vector_db):
-    # lowercase for consistency
     fname = filename.lower()
 
-    # get all vector IDs where metadata.source == filename
-    results = vector_db.query(
-        query_texts=[""],           # empty query, just want metadata match
-        n_results=1000,             # adjust if needed
-        filter={"source": fname}    # filter by filename
-    )
+    # get all IDs in the collection
+    all_ids = vector_db._collection.get(include=["metadatas"])["ids"]
+    all_metadatas = vector_db._collection.get(include=["metadatas"])["metadatas"]
 
-    # extract IDs
-    ids_to_delete = []
-    for res in results["ids"]:  # results["ids"] is a list of lists
-        ids_to_delete.extend(res)
+    # find IDs where metadata.source matches the filename
+    ids_to_delete = [
+        id_ for id_, meta in zip(all_ids, all_metadatas)
+        if meta.get("source") == fname
+    ]
 
     if not ids_to_delete:
         return {"filename": filename, "deleted": False, "reason": "No vectors found"}
 
-    # delete vectors by IDs
+    # delete the vectors
     vector_db._collection.delete(ids=ids_to_delete)
 
+    # persist changes
     vector_db.persist()
 
     return {"filename": filename, "deleted": True, "vectors_deleted": len(ids_to_delete)}

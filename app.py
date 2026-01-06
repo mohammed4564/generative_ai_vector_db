@@ -108,10 +108,58 @@ vector_db = None
 #     vector_db.save_local(VECTOR_DB_PATH)
 
 # pdf ingest function for Chroma DB
-def ingest_pdf(pdf_path):
+# def ingest_pdf(pdf_path):
+#     global vector_db
+
+#     loader = PyPDFLoader(pdf_path)
+#     docs = loader.load()
+
+#     splitter = RecursiveCharacterTextSplitter(
+#         chunk_size=1000,
+#         chunk_overlap=200
+#     )
+
+#     chunks = splitter.split_documents(docs)
+
+#     if vector_db is None:
+#         vector_db = Chroma(
+#             documents=chunks,
+#             embedding=embeddings,
+#             persist_directory=VECTOR_DB_PATH
+#         )
+#     else:
+#         vector_db.add_documents(chunks)
+
+#     vector_db.persist()
+#     print(f"✅ Added {len(chunks)} chunks to Chroma DB")
+
+# multiple file support upload code
+def ingest_document(file_path, filename, user_email):
     global vector_db
 
-    loader = PyPDFLoader(pdf_path)
+    ext = filename.lower().split(".")[-1]
+
+    if ext == "pdf":
+        loader = PyPDFLoader(file_path)
+
+    elif ext in ["txt", "md"]:
+        loader = TextLoader(file_path, encoding="utf-8")
+
+    elif ext in ["doc", "docx"]:
+        loader = UnstructuredWordDocumentLoader(file_path)
+
+    elif ext in ["xls", "xlsx"]:
+        loader = UnstructuredExcelLoader(file_path)
+
+    elif ext in ["ppt", "pptx"]:
+        loader = UnstructuredPowerPointLoader(file_path)
+
+    elif ext in ["html", "htm"]:
+        loader = UnstructuredHTMLLoader(file_path)
+
+    else:
+        raise ValueError(f"Unsupported file type: {ext}")
+
     docs = loader.load()
 
     splitter = RecursiveCharacterTextSplitter(
@@ -120,6 +168,14 @@ def ingest_pdf(pdf_path):
     )
 
     chunks = splitter.split_documents(docs)
+
+    # ✅ VERY IMPORTANT: Metadata
+    for chunk in chunks:
+        chunk.metadata.update({
+            "source": filename.lower(),
+            "user": user_email,
+            "type": ext
+        })
 
     if vector_db is None:
         vector_db = Chroma(
@@ -131,7 +187,8 @@ def ingest_pdf(pdf_path):
         vector_db.add_documents(chunks)
 
     vector_db.persist()
-    print(f"✅ Added {len(chunks)} chunks to Chroma DB")
+
+    print(f"✅ Added {len(chunks)} chunks from {filename}")
 
 # ---------------- LOGIN ----------------
 @app.route("/login", methods=["POST"])

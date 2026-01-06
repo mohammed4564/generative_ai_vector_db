@@ -3,7 +3,7 @@ import jwt
 from datetime import datetime, timedelta, UTC
 from flask import Flask, request, jsonify,g
 from dotenv import load_dotenv
-
+from docx import Document
 from groq import Groq
 
 from langchain_community.document_loaders import (PyPDFLoader,

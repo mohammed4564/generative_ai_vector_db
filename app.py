@@ -240,54 +240,54 @@ def ingest_document(file_path, filename, user_email):
     # vector_db.persist()
 
     # print(f"✅ Added {len(chunks)} chunks from {filename}")
-     else:
-     return {
-            "indexed": False,
-            "reason": "Unsupported file type"
-        }
-
-    docs = loader.load()
-    if not docs:
-        return {
-            "indexed": False,
-            "reason": "No readable content found"
-        }
-
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200
-    )
-
-    chunks = splitter.split_documents(docs)
-    chunks = [c for c in chunks if c.page_content.strip()]
-
-    if not chunks:
-        return {
-            "indexed": False,
-            "reason": "No valid text chunks created (likely scanned or text-box document)"
-        }
-
-    # ---- metadata ----
-    for chunk in chunks:
-        chunk.metadata.update({
-            "source": filename.lower(),
-            "user": user_email,
-            "type": ext
-        })
-
-    if vector_db is None:
-        vector_db = Chroma(
-            documents=chunks,
-            embedding=embeddings,
-            persist_directory=VECTOR_DB_PATH
-        )
     else:
-        vector_db.add_documents(chunks)
+        return {
+                "indexed": False,
+                "reason": "Unsupported file type"
+            }
 
-    return {
-        "indexed": True,
-        "chunks": len(chunks)
-    }
+        docs = loader.load()
+        if not docs:
+            return {
+                "indexed": False,
+                "reason": "No readable content found"
+            }
+
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=200
+        )
+
+        chunks = splitter.split_documents(docs)
+        chunks = [c for c in chunks if c.page_content.strip()]
+
+        if not chunks:
+            return {
+                "indexed": False,
+                "reason": "No valid text chunks created (likely scanned or text-box document)"
+            }
+
+        # ---- metadata ----
+        for chunk in chunks:
+            chunk.metadata.update({
+                "source": filename.lower(),
+                "user": user_email,
+                "type": ext
+            })
+
+        if vector_db is None:
+            vector_db = Chroma(
+                documents=chunks,
+                embedding=embeddings,
+                persist_directory=VECTOR_DB_PATH
+            )
+        else:
+            vector_db.add_documents(chunks)
+
+        return {
+            "indexed": True,
+            "chunks": len(chunks)
+        }
 
 # ---------------- LOGIN ----------------
 @app.route("/login", methods=["POST"])

@@ -178,6 +178,7 @@ def ingest_document(file_path, filename, user_email):
 
     # elif ext in ["doc", "docx"]:
     #     loader = UnstructuredWordDocumentLoader(file_path)
+    
     elif ext in ["doc", "docx"]:
         loader = UnstructuredWordDocumentLoader(file_path)
         docs = loader.load()
@@ -193,7 +194,6 @@ def ingest_document(file_path, filename, user_email):
                 )
 
             docs = [LCDocument(page_content=fallback_text)]
-
 
     elif ext in ["xls", "xlsx"]:
         loader = UnstructuredExcelLoader(file_path)

@@ -11,6 +11,7 @@ from langchain_community.document_loaders import (PyPDFLoader,
     UnstructuredExcelLoader,
     UnstructuredPowerPointLoader,
     UnstructuredHTMLLoader,
+    CSVLoader,
     UnstructuredWordDocumentLoader)
 # from langchain_community.vectorstores import FAISS
 from langchain_community.vectorstores import Chroma
@@ -146,6 +147,7 @@ ALLOWED_EXTENSIONS = {
     "docx",
     "xls",
     "xlsx",
+    "csv",
     "ppt",
     "pptx",
     "html",

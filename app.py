@@ -328,13 +328,34 @@ def upload_pdf():
     if ext not in ALLOWED_EXTENSIONS:
         return jsonify({"error": "Unsupported file type"}), 400
 
-    ingest_document(
-        file_path=path,
-        filename=file.filename,
-        user_email=g.email
+    # ingest_document(
+    #     file_path=path,
+    #     filename=file.filename,
+    #     user_email=g.email
+    # )
+
+    # return jsonify({"message": f" {ext}:documnet uploaded & indexed successfully"})
+    result = ingest_document(
+    file_path=path,
+    filename=file.filename,
+    user_email=g.email
     )
 
-    return jsonify({"message": f" {ext}:documnet uploaded & indexed successfully"})
+    if not result["indexed"]:
+        return jsonify({
+            "filename": file.filename,
+            "uploaded": True,
+            "indexed": False,
+            "reason": result["reason"]
+        }), 200
+
+    return jsonify({
+        "filename": file.filename,
+        "uploaded": True,
+        "indexed": True,
+        "chunks": result["chunks"]
+    }), 200
+
 
 # ---------------- CHAT ----------------
 @app.route("/chat", methods=["POST"])

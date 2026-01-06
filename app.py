@@ -177,7 +177,14 @@ def ingest_document(file_path, filename, user_email):
 
     elif ext in ["html", "htm"]:
         loader = UnstructuredHTMLLoader(file_path)
-
+    elif ext == "csv":
+        loader = CSVLoader(
+            file_path,
+            encoding="utf-8",
+            csv_args={
+                "delimiter": ","
+            }
+        )
     else:
         raise ValueError(f"Unsupported file type: {ext}")
 

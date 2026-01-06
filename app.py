@@ -76,7 +76,7 @@ groq_client = Groq(api_key=GROQ_API_KEY)
 
 vector_db = None
 
-# ---------------- PDF INGEST ----------------
+# ---------------- PDF INGEST faiss ----------------
 # def ingest_pdf(pdf_path):
 #     global vector_db
 
@@ -105,7 +105,32 @@ vector_db = None
 
 #     vector_db.save_local(VECTOR_DB_PATH)
 
-ingest_pdf
+# pdf ingest function for Chroma DB
+def ingest_pdf(pdf_path):
+    global vector_db
+
+    loader = PyPDFLoader(pdf_path)
+    docs = loader.load()
+
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=200
+    )
+
+    chunks = splitter.split_documents(docs)
+
+    if vector_db is None:
+        vector_db = Chroma(
+            documents=chunks,
+            embedding=embeddings,
+            persist_directory=VECTOR_DB_PATH
+        )
+    else:
+        vector_db.add_documents(chunks)
+
+    vector_db.persist()
+    print(f"✅ Added {len(chunks)} chunks to Chroma DB")
+
 # ---------------- LOGIN ----------------
 @app.route("/login", methods=["POST"])
 def login():

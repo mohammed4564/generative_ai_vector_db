@@ -212,8 +212,8 @@ def ingest_document(file_path, filename, user_email):
     # 🚨 VERY IMPORTANT
     chunks = [c for c in chunks if c.page_content.strip()]
 
-    if not chunks:
-        raise ValueError(f"No valid text chunks created from file: {filename}")
+    # if not chunks:
+    #     raise ValueError(f"No valid text chunks created from file: {filename}")
 
     # ✅ VERY IMPORTANT: Metadata
     for chunk in chunks:

@@ -10,3 +10,4 @@ groq
 python-dotenv
 pinecone-client
 sentence-transformers
+GitPython

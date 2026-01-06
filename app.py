@@ -6,19 +6,21 @@ from dotenv import load_dotenv
 from docx import Document
 from groq import Groq
 
-from langchain_community.document_loaders import (PyPDFLoader,
-    TextLoader,
-    UnstructuredExcelLoader,
-    UnstructuredPowerPointLoader,
-    UnstructuredHTMLLoader,
-    CSVLoader,
-    UnstructuredWordDocumentLoader)
+# from langchain_community.document_loaders import (PyPDFLoader,
+#     TextLoader,
+#     UnstructuredExcelLoader,
+#     UnstructuredPowerPointLoader,
+#     UnstructuredHTMLLoader,
+#     CSVLoader,
+#     UnstructuredWordDocumentLoader)
 # from langchain_community.vectorstores import FAISS
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from helper.jwt_request import jwt_required
+from helper.multiple_document_upload import ingest_document
+
 
 # ---------------- LOAD ENV ----------------
 load_dotenv()
@@ -156,129 +158,129 @@ ALLOWED_EXTENSIONS = {
 
 
 # multiple file support upload code
-def ingest_document(file_path, filename, user_email):
-    global vector_db
+# def ingest_document(file_path, filename, user_email):
+#     global vector_db
 
-    ext = filename.lower().split(".")[-1]
+#     ext = filename.lower().split(".")[-1]
 
-    if ext == "pdf":
-        loader = PyPDFLoader(file_path)
+#     if ext == "pdf":
+#         loader = PyPDFLoader(file_path)
 
-    elif ext in ["txt", "md"]:
-        loader = TextLoader(file_path, encoding="utf-8")
+#     elif ext in ["txt", "md"]:
+#         loader = TextLoader(file_path, encoding="utf-8")
 
-    elif ext in ["doc", "docx"]:
-        loader = UnstructuredWordDocumentLoader(file_path)
+#     elif ext in ["doc", "docx"]:
+#         loader = UnstructuredWordDocumentLoader(file_path)
 
-    elif ext in ["xls", "xlsx"]:
-        loader = UnstructuredExcelLoader(file_path)
+#     elif ext in ["xls", "xlsx"]:
+#         loader = UnstructuredExcelLoader(file_path)
 
-    elif ext in ["ppt", "pptx"]:
-        loader = UnstructuredPowerPointLoader(file_path)
+#     elif ext in ["ppt", "pptx"]:
+#         loader = UnstructuredPowerPointLoader(file_path)
 
-    elif ext in ["html", "htm"]:
-        loader = UnstructuredHTMLLoader(file_path)
-    elif ext == "csv":
-        loader = CSVLoader(
-            file_path,
-            encoding="utf-8",
-            csv_args={
-                "delimiter": ","
-            }
-        )
-    # else:
-    #     raise ValueError(f"Unsupported file type: {ext}")
+#     elif ext in ["html", "htm"]:
+#         loader = UnstructuredHTMLLoader(file_path)
+#     elif ext == "csv":
+#         loader = CSVLoader(
+#             file_path,
+#             encoding="utf-8",
+#             csv_args={
+#                 "delimiter": ","
+#             }
+#         )
+#     # else:
+#     #     raise ValueError(f"Unsupported file type: {ext}")
 
-    # docs = loader.load()
-    # if not docs:
-    #     raise ValueError(f"No readable content found in file: {filename}")
+#     # docs = loader.load()
+#     # if not docs:
+#     #     raise ValueError(f"No readable content found in file: {filename}")
     
-    # splitter = RecursiveCharacterTextSplitter(
-    #     chunk_size=1000,
-    #     chunk_overlap=200
-    # )
+#     # splitter = RecursiveCharacterTextSplitter(
+#     #     chunk_size=1000,
+#     #     chunk_overlap=200
+#     # )
 
-    # chunks = splitter.split_documents(docs)
+#     # chunks = splitter.split_documents(docs)
     
-    # # 🚨 VERY IMPORTANT
-    # chunks = [c for c in chunks if c.page_content.strip()]
+#     # # 🚨 VERY IMPORTANT
+#     # chunks = [c for c in chunks if c.page_content.strip()]
 
-    # # if not chunks:
-    # #     raise ValueError(f"No valid text chunks created from file: {filename}")
+#     # # if not chunks:
+#     # #     raise ValueError(f"No valid text chunks created from file: {filename}")
 
-    # if not chunks:
-    #     print(f"⚠️ Skipping {filename}: no readable text found")
-    #     return
+#     # if not chunks:
+#     #     print(f"⚠️ Skipping {filename}: no readable text found")
+#     #     return
 
 
-    # # ✅ VERY IMPORTANT: Metadata
-    # for chunk in chunks:
-    #     chunk.metadata.update({
-    #         "source": filename.lower(),
-    #         "user": user_email,
-    #         "type": ext
-    #     })
+#     # # ✅ VERY IMPORTANT: Metadata
+#     # for chunk in chunks:
+#     #     chunk.metadata.update({
+#     #         "source": filename.lower(),
+#     #         "user": user_email,
+#     #         "type": ext
+#     #     })
 
-    # if vector_db is None:
-    #     vector_db = Chroma(
-    #         documents=chunks,
-    #         embedding=embeddings,
-    #         persist_directory=VECTOR_DB_PATH
-    #     )
-    # else:
-    #     vector_db.add_documents(chunks)
+#     # if vector_db is None:
+#     #     vector_db = Chroma(
+#     #         documents=chunks,
+#     #         embedding=embeddings,
+#     #         persist_directory=VECTOR_DB_PATH
+#     #     )
+#     # else:
+#     #     vector_db.add_documents(chunks)
 
-    # vector_db.persist()
+#     # vector_db.persist()
 
-    # print(f"✅ Added {len(chunks)} chunks from {filename}")
-    else:
-        return {
-                "indexed": False,
-                "reason": "Unsupported file type"
-            }
+#     # print(f"✅ Added {len(chunks)} chunks from {filename}")
+#     else:
+#         return {
+#                 "indexed": False,
+#                 "reason": "Unsupported file type"
+#             }
 
-    docs = loader.load()
-    if not docs:
-        return {
-            "indexed": False,
-            "reason": "No readable content found"
-        }
+#     docs = loader.load()
+#     if not docs:
+#         return {
+#             "indexed": False,
+#             "reason": "No readable content found"
+#         }
 
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200
-    )
+#     splitter = RecursiveCharacterTextSplitter(
+#         chunk_size=1000,
+#         chunk_overlap=200
+#     )
 
-    chunks = splitter.split_documents(docs)
-    chunks = [c for c in chunks if c.page_content.strip()]
+#     chunks = splitter.split_documents(docs)
+#     chunks = [c for c in chunks if c.page_content.strip()]
 
-    if not chunks:
-        return {
-            "indexed": False,
-            "reason": "No valid text chunks created (likely scanned or text-box document)"
-        }
+#     if not chunks:
+#         return {
+#             "indexed": False,
+#             "reason": "No valid text chunks created (likely scanned or text-box document)"
+#         }
 
-    # ---- metadata ----
-    for chunk in chunks:
-        chunk.metadata.update({
-            "source": filename.lower(),
-            "user": user_email,
-            "type": ext
-        })
+#     # ---- metadata ----
+#     for chunk in chunks:
+#         chunk.metadata.update({
+#             "source": filename.lower(),
+#             "user": user_email,
+#             "type": ext
+#         })
 
-    if vector_db is None:
-        vector_db = Chroma(
-            documents=chunks,
-            embedding=embeddings,
-            persist_directory=VECTOR_DB_PATH
-        )
-    else:
-        vector_db.add_documents(chunks)
+#     if vector_db is None:
+#         vector_db = Chroma(
+#             documents=chunks,
+#             embedding=embeddings,
+#             persist_directory=VECTOR_DB_PATH
+#         )
+#     else:
+#         vector_db.add_documents(chunks)
 
-    return {
-        "indexed": True,
-        "chunks": len(chunks)
-    }
+#     return {
+#         "indexed": True,
+#         "chunks": len(chunks)
+#     }
 
 # ---------------- LOGIN ----------------
 @app.route("/login", methods=["POST"])

@@ -318,8 +318,8 @@ def upload_pdf():
     # ingest_pdf(path)
     ext = file.filename.lower().split(".")[-1]
 
-    if ext not in ALLOWED_EXTENSIONS:
-        return jsonify({"error": "Unsupported file type"}), 400
+    # if ext not in ALLOWED_EXTENSIONS:
+    #     return jsonify({"error": "Unsupported file type"}), 400
 
     # ingest_document(
     #     file_path=path,

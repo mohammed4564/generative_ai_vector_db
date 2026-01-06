@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify,g
 from dotenv import load_dotenv
 from docx import Document
 from groq import Groq
-
+from langchain.schema import Document as LCDocument
 from langchain_community.document_loaders import (PyPDFLoader,
     TextLoader,
     UnstructuredExcelLoader,
@@ -179,21 +179,20 @@ def ingest_document(file_path, filename, user_email):
     # elif ext in ["doc", "docx"]:
     #     loader = UnstructuredWordDocumentLoader(file_path)
     elif ext in ["doc", "docx"]:
-    loader = UnstructuredWordDocumentLoader(file_path)
-    docs = loader.load()
+        loader = UnstructuredWordDocumentLoader(file_path)
+        docs = loader.load()
 
-    # 🔥 FALLBACK if Unstructured fails
-    if not docs or not any(d.page_content.strip() for d in docs):
-        fallback_text = extract_docx_text_fallback(file_path)
+        # 🔥 FALLBACK if Unstructured fails
+        if not docs or not any(d.page_content.strip() for d in docs):
+            fallback_text = extract_docx_text_fallback(file_path)
 
-        if not fallback_text.strip():
-            raise ValueError(
-                f"No readable text found in DOCX file: {filename}. "
-                "This file likely contains only images or text boxes."
-            )
+            if not fallback_text.strip():
+                raise ValueError(
+                    f"No readable text found in DOCX file: {filename}. "
+                    "This file likely contains only images or text boxes."
+                )
 
-        from langchain.schema import Document as LCDocument
-        docs = [LCDocument(page_content=fallback_text)]
+            docs = [LCDocument(page_content=fallback_text)]
 
 
     elif ext in ["xls", "xlsx"]:

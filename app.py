@@ -9,8 +9,6 @@ from groq import Groq
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
-# from pinecone import Pinecone,ServerlessSpec
-# from langchain_pinecone import PineconeVectorStore
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from helper.jwt_request import jwt_required
@@ -20,29 +18,6 @@ load_dotenv()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-# pc=Pinecone(PINECONE_API_KEY = os.getenv("PINECONE_API_KEY"))
-# index = pc.Index("pdf-rag-index")
-# print(index.describe_index_stats())
-
-
-# penicone setup
-
-# INDEX_NAME = "pdf-rag-index"
-
-# if INDEX_NAME not in [i.name for i in pc.list_indexes()]:
-#     pc.create_index(
-#         name=INDEX_NAME,
-#         dimension=384,  # all-MiniLM-L6-v2 embedding size
-#         metric="cosine",
-#         spec=ServerlessSpec(
-#             cloud="aws",
-#             region="us-east-1"
-#         )
-#     )
-
-# embeddings = HuggingFaceEmbeddings(
-#     model_name="all-MiniLM-L6-v2"
-# )
 
 if not GROQ_API_KEY:
     raise RuntimeError("GROQ_API_KEY missing in .env")
@@ -116,27 +91,7 @@ def ingest_pdf(pdf_path):
         vector_db.add_documents(chunks)
 
     vector_db.save_local(VECTOR_DB_PATH)
-    
-# penicone upsert version
-# def ingest_pdf(pdf_path):
-#     loader = PyPDFLoader(pdf_path)
-#     docs = loader.load()
 
-#     splitter = RecursiveCharacterTextSplitter(
-#         chunk_size=1000,
-#         chunk_overlap=200
-#     )
-
-#     chunks = splitter.split_documents(docs)
-
-#     # Always upsert into Pinecone
-#     PineconeVectorStore.from_documents(
-#         documents=chunks,
-#         embedding=embeddings,
-#         index_name=INDEX_NAME
-#     )
-
-#     print("✅ PDF chunks stored in Pinecone")
 
 # ---------------- LOGIN ----------------
 @app.route("/login", methods=["POST"])

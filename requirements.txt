@@ -15,3 +15,5 @@ chromadb
 unstructured
 python-docx
 openpyxl pandas
+python-pptx
+beautifulsoup4 lxml

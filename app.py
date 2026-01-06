@@ -223,7 +223,8 @@ def upload_pdf():
     path = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(path)
 
-    ingest_pdf(path)
+    
+    # ingest_pdf(path)
 
     return jsonify({"message": "PDF uploaded & indexed successfully"})
 

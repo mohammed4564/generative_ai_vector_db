@@ -176,14 +176,27 @@ def ingest_document(
     }
 
 def delete_file_vectors(filename: str, vector_db):
-    """
-    Delete all vectors in Chroma that belong to a given file (by filename)
-    """
-    # filter by source metadata
-    vector_db.delete(filter={"source": filename.lower()})
+    # lowercase for consistency
+    fname = filename.lower()
+
+    # get all vector IDs where metadata.source == filename
+    results = vector_db.query(
+        query_texts=[""],           # empty query, just want metadata match
+        n_results=1000,             # adjust if needed
+        filter={"source": fname}    # filter by filename
+    )
+
+    # extract IDs
+    ids_to_delete = []
+    for res in results["ids"]:  # results["ids"] is a list of lists
+        ids_to_delete.extend(res)
+
+    if not ids_to_delete:
+        return {"filename": filename, "deleted": False, "reason": "No vectors found"}
+
+    # delete vectors by IDs
+    vector_db._collection.delete(ids=ids_to_delete)
+
     vector_db.persist()
-    print(f"✅ Deleted all vectors for {filename}")
-    return {
-        "filename": filename,
-        "deleted": True
-    }
+
+    return {"filename": filename, "deleted": True, "vectors_deleted": len(ids_to_delete)}

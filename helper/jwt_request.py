@@ -1,4 +1,4 @@
-```python
+
 import jwt
 import os
 from functools import wraps
@@ -67,4 +67,3 @@ def jwt_required(fn):
         return fn(*args, **kwargs)
 
     return wrapper
-```

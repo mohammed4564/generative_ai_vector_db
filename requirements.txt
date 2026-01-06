@@ -1,8 +1,12 @@
-flask
-pyjwt
+Flask
+PyJWT
 langchain
 langchain-community
 pypdf
 faiss-cpu
 openai
 tiktoken
+groq
+python-dotenv
+pinecone-client
+sentence-transformers

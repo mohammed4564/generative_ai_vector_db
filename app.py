@@ -9,8 +9,8 @@ from groq import Groq
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from pinecone import Pinecone,ServerlessSpec
-from langchain_pinecone import PineconeVectorStore
+# from pinecone import Pinecone,ServerlessSpec
+# from langchain_pinecone import PineconeVectorStore
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from helper.jwt_request import jwt_required
@@ -20,9 +20,9 @@ load_dotenv()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-pc=Pinecone(PINECONE_API_KEY = os.getenv("PINECONE_API_KEY"))
-index = pc.Index("pdf-rag-index")
-print(index.describe_index_stats())
+# pc=Pinecone(PINECONE_API_KEY = os.getenv("PINECONE_API_KEY"))
+# index = pc.Index("pdf-rag-index")
+# print(index.describe_index_stats())
 
 
 # penicone setup

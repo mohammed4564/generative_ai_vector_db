@@ -195,32 +195,79 @@ def ingest_document(file_path, filename, user_email):
                 "delimiter": ","
             }
         )
-    else:
-        raise ValueError(f"Unsupported file type: {ext}")
+   
+    #     raise ValueError(f"Unsupported file type: {ext}")
+
+    # docs = loader.load()
+    # if not docs:
+    #     raise ValueError(f"No readable content found in file: {filename}")
+    
+    # splitter = RecursiveCharacterTextSplitter(
+    #     chunk_size=1000,
+    #     chunk_overlap=200
+    # )
+
+    # chunks = splitter.split_documents(docs)
+    
+    # # 🚨 VERY IMPORTANT
+    # chunks = [c for c in chunks if c.page_content.strip()]
+
+    # # if not chunks:
+    # #     raise ValueError(f"No valid text chunks created from file: {filename}")
+
+    # if not chunks:
+    #     print(f"⚠️ Skipping {filename}: no readable text found")
+    #     return
+
+
+    # # ✅ VERY IMPORTANT: Metadata
+    # for chunk in chunks:
+    #     chunk.metadata.update({
+    #         "source": filename.lower(),
+    #         "user": user_email,
+    #         "type": ext
+    #     })
+
+    # if vector_db is None:
+    #     vector_db = Chroma(
+    #         documents=chunks,
+    #         embedding=embeddings,
+    #         persist_directory=VECTOR_DB_PATH
+    #     )
+    # else:
+    #     vector_db.add_documents(chunks)
+
+    # vector_db.persist()
+
+    # print(f"✅ Added {len(chunks)} chunks from {filename}")
+     else:
+     return {
+            "indexed": False,
+            "reason": "Unsupported file type"
+        }
 
     docs = loader.load()
     if not docs:
-        raise ValueError(f"No readable content found in file: {filename}")
-    
+        return {
+            "indexed": False,
+            "reason": "No readable content found"
+        }
+
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
         chunk_overlap=200
     )
 
     chunks = splitter.split_documents(docs)
-    
-    # 🚨 VERY IMPORTANT
     chunks = [c for c in chunks if c.page_content.strip()]
 
-    # if not chunks:
-    #     raise ValueError(f"No valid text chunks created from file: {filename}")
-
     if not chunks:
-        print(f"⚠️ Skipping {filename}: no readable text found")
-        return
+        return {
+            "indexed": False,
+            "reason": "No valid text chunks created (likely scanned or text-box document)"
+        }
 
-
-    # ✅ VERY IMPORTANT: Metadata
+    # ---- metadata ----
     for chunk in chunks:
         chunk.metadata.update({
             "source": filename.lower(),
@@ -237,9 +284,10 @@ def ingest_document(file_path, filename, user_email):
     else:
         vector_db.add_documents(chunks)
 
-    vector_db.persist()
-
-    print(f"✅ Added {len(chunks)} chunks from {filename}")
+    return {
+        "indexed": True,
+        "chunks": len(chunks)
+    }
 
 # ---------------- LOGIN ----------------
 @app.route("/login", methods=["POST"])

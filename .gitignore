@@ -1,0 +1,17 @@
+# Ignore Python virtual environment
+python_pip/
+venv/
+
+# Ignore AI agent scripts
+github_repo_ai_agent/
+
+# Ignore environment variables
+.env
+
+# Ignore Python cache
+__pycache__/
+
+# Ignore logs, uploads, vector stores
+chat_logs/
+uploads/
+vector_store/

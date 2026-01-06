@@ -1,0 +1,8 @@
+flask
+pyjwt
+langchain
+langchain-community
+pypdf
+faiss-cpu
+openai
+tiktoken

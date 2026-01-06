@@ -12,3 +12,6 @@ pinecone-client
 sentence-transformers
 GitPython
 chromadb
+unstructured
+python-docx
+openpyxl pandas

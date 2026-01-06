@@ -328,36 +328,28 @@ def upload_pdf():
     #     user_email=g.email
     # )
 
-    # return jsonify({"message": f" {ext}:documnet uploaded & indexed successfully"})
-    # result = ingest_document(
-    # file_path=path,
-    # filename=file.filename,
-    # user_email=g.email
-    # )
-
-    # if not result["indexed"]:
-    #     return jsonify({
-    #         "filename": file.filename,
-    #         "uploaded": True,
-    #         "indexed": False,
-    #         "reason": result["reason"]
-    #     }), 200
-
-    # return jsonify({
-    #     "filename": file.filename,
-    #     "uploaded": True,
-    #     "indexed": True,
-    #     "chunks": result["chunks"]
-    # }), 200
+    return jsonify({"message": f" {ext}:documnet uploaded & indexed successfully"})
     result = ingest_document(
     file_path=path,
     filename=file.filename,
-    user_email=g.email,
-    vector_db=vector_db,
-    embeddings=embeddings,
-    persist_directory=VECTOR_DB_PATH,
+    user_email=g.email
     )
-    vector_db = result["vector_db"]
+
+    if not result["indexed"]:
+        return jsonify({
+            "filename": file.filename,
+            "uploaded": True,
+            "indexed": False,
+            "reason": result["reason"]
+        }), 200
+
+    return jsonify({
+        "filename": file.filename,
+        "uploaded": True,
+        "indexed": True,
+        "chunks": result["chunks"]
+    }), 200
+ 
 
 
 

@@ -1,6 +1,6 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
-
+import hashlib
 from langchain_community.document_loaders import (
     PyPDFLoader,
     TextLoader,
@@ -10,6 +10,13 @@ from langchain_community.document_loaders import (
     UnstructuredPowerPointLoader,
     UnstructuredHTMLLoader,
 )
+
+
+def compute_file_hash(file_path: str) -> str:
+    """Compute SHA256 hash of the file content"""
+    with open(file_path, "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()
+
 
 # -----------------------------
 # Supported file extensions

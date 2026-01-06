@@ -215,6 +215,11 @@ def ingest_document(file_path, filename, user_email):
     # if not chunks:
     #     raise ValueError(f"No valid text chunks created from file: {filename}")
 
+    if not chunks:
+        print(f"⚠️ Skipping {filename}: no readable text found")
+        return
+
+
     # ✅ VERY IMPORTANT: Metadata
     for chunk in chunks:
         chunk.metadata.update({

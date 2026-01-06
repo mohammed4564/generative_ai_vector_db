@@ -189,7 +189,9 @@ def ingest_document(file_path, filename, user_email):
         raise ValueError(f"Unsupported file type: {ext}")
 
     docs = loader.load()
-
+    if not docs:
+        raise ValueError(f"No readable content found in file: {filename}")
+    
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
         chunk_overlap=200

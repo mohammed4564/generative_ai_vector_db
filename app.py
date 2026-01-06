@@ -138,6 +138,20 @@ vector_db = None
 #     vector_db.persist()
 #     print(f"✅ Added {len(chunks)} chunks to Chroma DB")
 
+ALLOWED_EXTENSIONS = {
+    "pdf",
+    "txt",
+    "md",
+    "doc",
+    "docx",
+    "xls",
+    "xlsx",
+    "ppt",
+    "pptx",
+    "html",
+    "htm"
+}
+
 # multiple file support upload code
 def ingest_document(file_path, filename, user_email):
     global vector_db

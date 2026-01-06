@@ -174,3 +174,16 @@ def ingest_document(
         "chunks": len(chunks),
         "vector_db": vector_db,
     }
+
+def delete_file_vectors(filename: str, vector_db):
+    """
+    Delete all vectors in Chroma that belong to a given file (by filename)
+    """
+    # filter by source metadata
+    vector_db.delete(filter={"source": filename.lower()})
+    vector_db.persist()
+    print(f"✅ Deleted all vectors for {filename}")
+    return {
+        "filename": filename,
+        "deleted": True
+    }

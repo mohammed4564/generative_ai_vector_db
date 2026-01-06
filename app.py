@@ -304,6 +304,7 @@ def login():
 @app.route("/upload-pdf", methods=["POST"])
 @jwt_required
 def upload_pdf():
+    global vector_db   # ✅ REQUIRED
     file = request.files.get("file")
 
     if not file:

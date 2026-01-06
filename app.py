@@ -70,6 +70,8 @@ def load_vector_db():
     )
 
     print("✅ Chroma DB loaded")
+    print("Total vectors:", vector_db._collection.count())
+
 
 # ---------------- GROQ LLM ----------------
 groq_client = Groq(api_key=GROQ_API_KEY)

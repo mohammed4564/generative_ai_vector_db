@@ -245,8 +245,8 @@ def upload_pdf():
     if not file:
         return jsonify({"error": "No file uploaded"}), 400
 
-    if not file.filename.lower().endswith(".pdf"):
-        return jsonify({"error": "Only PDF files allowed"}), 400
+    # if not file.filename.lower().endswith(".pdf"):
+    #     return jsonify({"error": "Only PDF files allowed"}), 400
 
     path = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(path)

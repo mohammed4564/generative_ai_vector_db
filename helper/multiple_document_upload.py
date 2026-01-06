@@ -134,13 +134,27 @@ def ingest_document(
             "reason": "No valid text chunks (scanned / image-based / text-box document)",
             "vector_db": vector_db,
         }
+    file_hash = compute_file_hash(file_path)
+
+    # ---- Check duplicates ----
+    if vector_db is not None:
+        existing = vector_db.get(where={"file_hash": file_hash})
+        if existing["ids"]:
+            return {
+                "uploaded": True,
+                "indexed": False,
+                "filename": filename,
+                "reason": "File already exists",
+                "vector_db": vector_db
+            }
 
     # ---- metadata ----
     for chunk in chunks:
         chunk.metadata.update({
             "source": filename.lower(),
             "user": user_email,
-            "type": ext
+            "type": ext,
+            "file_hash": file_hash  # ✅ this is key for duplicate detection
         })
 
     # ---- vector store ----

@@ -154,15 +154,6 @@ ALLOWED_EXTENSIONS = {
     "htm"
 }
 
-def extract_docx_text_fallback(file_path):
-    doc = Document(file_path)
-    text = []
-
-    for para in doc.paragraphs:
-        if para.text.strip():
-            text.append(para.text)
-
-    return "\n".join(text)
 
 # multiple file support upload code
 def ingest_document(file_path, filename, user_email):

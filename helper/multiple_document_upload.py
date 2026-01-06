@@ -1,5 +1,5 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 
 from langchain_community.document_loaders import (
     PyPDFLoader,
@@ -34,7 +34,11 @@ def get_loader(file_path: str, ext: str):
         return TextLoader(file_path, encoding="utf-8")
 
     if ext == "csv":
-        return CSVLoader(file_path, encoding="utf-8")
+        return CSVLoader(
+            file_path,
+            encoding="utf-8",
+            csv_args={"delimiter": ","}
+        )
 
     if ext in ["doc", "docx"]:
         return UnstructuredWordDocumentLoader(file_path)
@@ -72,6 +76,7 @@ def ingest_document(
             "indexed": False,
             "filename": filename,
             "reason": "Unsupported file type",
+            "vector_db": vector_db,
         }
 
     loader = get_loader(file_path, ext)
@@ -81,6 +86,7 @@ def ingest_document(
             "indexed": False,
             "filename": filename,
             "reason": "No loader available for this file type",
+            "vector_db": vector_db,
         }
 
     # ---- load document safely ----
@@ -92,6 +98,7 @@ def ingest_document(
             "indexed": False,
             "filename": filename,
             "reason": f"Loader error: {str(e)}",
+            "vector_db": vector_db,
         }
 
     if not docs:
@@ -100,6 +107,7 @@ def ingest_document(
             "indexed": False,
             "filename": filename,
             "reason": "No readable content found",
+            "vector_db": vector_db,
         }
 
     # ---- split text ----
@@ -117,6 +125,7 @@ def ingest_document(
             "indexed": False,
             "filename": filename,
             "reason": "No valid text chunks (scanned / image-based / text-box document)",
+            "vector_db": vector_db,
         }
 
     # ---- metadata ----
@@ -137,11 +146,10 @@ def ingest_document(
     else:
         vector_db.add_documents(chunks)
 
-    vector_db.persist()
-
     return {
         "uploaded": True,
         "indexed": True,
         "filename": filename,
         "chunks": len(chunks),
+        "vector_db": vector_db,
     }

@@ -141,20 +141,20 @@ vector_db = None
 #     vector_db.persist()
 #     print(f"✅ Added {len(chunks)} chunks to Chroma DB")
 
-ALLOWED_EXTENSIONS = {
-    "pdf",
-    "txt",
-    "md",
-    "doc",
-    "docx",
-    "xls",
-    "xlsx",
-    "csv",
-    "ppt",
-    "pptx",
-    "html",
-    "htm"
-}
+# ALLOWED_EXTENSIONS = {
+#     "pdf",
+#     "txt",
+#     "md",
+#     "doc",
+#     "docx",
+#     "xls",
+#     "xlsx",
+#     "csv",
+#     "ppt",
+#     "pptx",
+#     "html",
+#     "htm"
+# }
 
 
 # multiple file support upload code

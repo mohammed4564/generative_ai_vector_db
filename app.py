@@ -301,40 +301,82 @@ def login():
     return jsonify({"access_token": token})
 
 # ---------------- UPLOAD PDF ----------------
+# @app.route("/upload-pdf", methods=["POST"])
+# @jwt_required
+# def upload_pdf():
+#     global vector_db   # ✅ REQUIRED
+#     file = request.files.get("file")
+
+#     if not file:
+#         return jsonify({"error": "No file uploaded"}), 400
+
+#     # if not file.filename.lower().endswith(".pdf"):
+#     #     return jsonify({"error": "Only PDF files allowed"}), 400
+
+#     path = os.path.join(UPLOAD_FOLDER, file.filename)
+#     file.save(path)
+
+#     # ingest_pdf(path)
+#     ext = file.filename.lower().split(".")[-1]
+
+#     # if ext not in ALLOWED_EXTENSIONS:
+#     #     return jsonify({"error": "Unsupported file type"}), 400
+
+#     # ingest_document(
+#     #     file_path=path,
+#     #     filename=file.filename,
+#     #     user_email=g.email
+#     # )
+
+#     # return jsonify({"message": f" {ext}:documnet uploaded & indexed successfully"})
+#     # result = ingest_document(
+#     # file_path=path,
+#     # filename=file.filename,
+#     # user_email=g.email
+#     # )
+
+#     # if not result["indexed"]:
+#     #     return jsonify({
+#     #         "filename": file.filename,
+#     #         "uploaded": True,
+#     #         "indexed": False,
+#     #         "reason": result["reason"]
+#     #     }), 200
+
+#     # return jsonify({
+#     #     "filename": file.filename,
+#     #     "uploaded": True,
+#     #     "indexed": True,
+#     #     "chunks": result["chunks"]
+#     # }), 200
+ 
+
 @app.route("/upload-pdf", methods=["POST"])
 @jwt_required
 def upload_pdf():
     global vector_db   # ✅ REQUIRED
+
     file = request.files.get("file")
 
     if not file:
         return jsonify({"error": "No file uploaded"}), 400
 
-    # if not file.filename.lower().endswith(".pdf"):
-    #     return jsonify({"error": "Only PDF files allowed"}), 400
-
     path = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(path)
 
-    # ingest_pdf(path)
-    ext = file.filename.lower().split(".")[-1]
-
-    # if ext not in ALLOWED_EXTENSIONS:
-    #     return jsonify({"error": "Unsupported file type"}), 400
-
-    # ingest_document(
-    #     file_path=path,
-    #     filename=file.filename,
-    #     user_email=g.email
-    # )
-
-    return jsonify({"message": f" {ext}:documnet uploaded & indexed successfully"})
     result = ingest_document(
-    file_path=path,
-    filename=file.filename,
-    user_email=g.email
+        file_path=path,
+        filename=file.filename,
+        user_email=g.email,
+        vector_db=vector_db,
+        embeddings=embeddings,
+        persist_directory=VECTOR_DB_PATH,
     )
 
+    # ✅ update global vector_db
+    vector_db = result["vector_db"]
+
+    # ---- always return a response ----
     if not result["indexed"]:
         return jsonify({
             "filename": file.filename,
@@ -349,8 +391,6 @@ def upload_pdf():
         "indexed": True,
         "chunks": result["chunks"]
     }), 200
- 
-
 
 
 # ---------------- CHAT ----------------

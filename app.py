@@ -55,7 +55,7 @@ def load_vector_db():
                 allow_dangerous_deserialization=True
             )
             print("✅ Vector DB loaded from disk")
-            print(vector_db.index)
+            print(vector_db.index.ntotal,"vectors loaded.")
         except Exception as e:
             print("❌ Failed to load vector DB:", e)
 

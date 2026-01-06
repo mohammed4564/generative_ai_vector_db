@@ -16,8 +16,6 @@ from groq import Groq
 # from langchain_community.vectorstores import FAISS
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
 from helper.jwt_request import jwt_required
 from helper.multiple_document_upload import ingest_document
 

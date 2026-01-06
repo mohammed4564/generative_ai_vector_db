@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify,g
 from dotenv import load_dotenv
 from docx import Document
 from groq import Groq
-from langchain.schema import Document as LCDocument
+from langchain_core.documents import Document as LCDocument
 from langchain_community.document_loaders import (PyPDFLoader,
     TextLoader,
     UnstructuredExcelLoader,
@@ -178,7 +178,7 @@ def ingest_document(file_path, filename, user_email):
 
     # elif ext in ["doc", "docx"]:
     #     loader = UnstructuredWordDocumentLoader(file_path)
-    
+
     elif ext in ["doc", "docx"]:
         loader = UnstructuredWordDocumentLoader(file_path)
         docs = loader.load()

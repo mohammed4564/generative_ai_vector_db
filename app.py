@@ -176,25 +176,8 @@ def ingest_document(file_path, filename, user_email):
     elif ext in ["txt", "md"]:
         loader = TextLoader(file_path, encoding="utf-8")
 
-    # elif ext in ["doc", "docx"]:
-    #     loader = UnstructuredWordDocumentLoader(file_path)
     elif ext in ["doc", "docx"]:
         loader = UnstructuredWordDocumentLoader(file_path)
-        docs = loader.load()
-
-        # 🔥 FALLBACK if Unstructured fails
-        if not docs or not any(d.page_content.strip() for d in docs):
-            fallback_text = extract_docx_text_fallback(file_path)
-
-            if not fallback_text.strip():
-                raise ValueError(
-                    f"No readable text found in DOCX file: {filename}. "
-                    "This file likely contains only images or text boxes."
-                )
-
-
-            docs = [LCDocument(page_content=fallback_text)]
-
 
     elif ext in ["xls", "xlsx"]:
         loader = UnstructuredExcelLoader(file_path)

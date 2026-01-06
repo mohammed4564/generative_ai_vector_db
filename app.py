@@ -263,7 +263,7 @@ def upload_pdf():
         user_email=g.email
     )
 
-    return jsonify({"message": " uploaded & indexed successfully"})
+    return jsonify({"message": f" {ext}: uploaded & indexed successfully"})
 
 # ---------------- CHAT ----------------
 @app.route("/chat", methods=["POST"])

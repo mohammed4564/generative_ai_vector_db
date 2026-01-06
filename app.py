@@ -44,21 +44,32 @@ embeddings = HuggingFaceEmbeddings(
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 VECTOR_DB_PATH = os.path.join(BASE_DIR, "vector_store")
 
-# ---------------- LOAD VECTOR DB IF EXISTS ----------------
+# ---------------- LOAD VECTOR DB FAISS IF EXISTS ----------------
+# def load_vector_db():
+#     global vector_db
+
+#     if os.path.exists(VECTOR_DB_PATH):
+#         try:
+#             vector_db = FAISS.load_local(
+#                 VECTOR_DB_PATH,
+#                 embeddings,
+#                 allow_dangerous_deserialization=True
+#             )
+#             print("✅ Vector DB loaded from disk")
+#             print(vector_db.index.ntotal,"vectors loaded.")
+#         except Exception as e:
+#             print("❌ Failed to load vector DB:", e)
+
+# ---------------- LOAD VECTOR DB CHROMA IF EXISTS ----------------
 def load_vector_db():
     global vector_db
 
-    if os.path.exists(VECTOR_DB_PATH):
-        try:
-            vector_db = FAISS.load_local(
-                VECTOR_DB_PATH,
-                embeddings,
-                allow_dangerous_deserialization=True
-            )
-            print("✅ Vector DB loaded from disk")
-            print(vector_db.index.ntotal,"vectors loaded.")
-        except Exception as e:
-            print("❌ Failed to load vector DB:", e)
+    vector_db = Chroma(
+        persist_directory=VECTOR_DB_PATH,
+        embedding_function=embeddings
+    )
+
+    print("✅ Chroma DB loaded")
 
 # ---------------- GROQ LLM ----------------
 groq_client = Groq(api_key=GROQ_API_KEY)
@@ -66,35 +77,35 @@ groq_client = Groq(api_key=GROQ_API_KEY)
 vector_db = None
 
 # ---------------- PDF INGEST ----------------
-def ingest_pdf(pdf_path):
-    global vector_db
+# def ingest_pdf(pdf_path):
+#     global vector_db
 
-    loader = PyPDFLoader(pdf_path)
-    docs = loader.load()
+#     loader = PyPDFLoader(pdf_path)
+#     docs = loader.load()
 
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200
-    )
+#     splitter = RecursiveCharacterTextSplitter(
+#         chunk_size=1000,
+#         chunk_overlap=200
+#     )
 
-    chunks = splitter.split_documents(docs)
+#     chunks = splitter.split_documents(docs)
 
-    vector_db = FAISS.from_documents(chunks, embeddings)
-    vector_db.save_local(VECTOR_DB_PATH)
+#     vector_db = FAISS.from_documents(chunks, embeddings)
+#     vector_db.save_local(VECTOR_DB_PATH)
 
-    if vector_db is None:
-        # First PDF → create new vector DB
-        vector_db = FAISS.from_documents(chunks, embeddings)
+#     if vector_db is None:
+#         # First PDF → create new vector DB
+#         vector_db = FAISS.from_documents(chunks, embeddings)
 
      
 
-    else:
-        # Additional PDFs → add to existing DB
-        vector_db.add_documents(chunks)
+#     else:
+#         # Additional PDFs → add to existing DB
+#         vector_db.add_documents(chunks)
 
-    vector_db.save_local(VECTOR_DB_PATH)
+#     vector_db.save_local(VECTOR_DB_PATH)
 
-
+ingest_pdf
 # ---------------- LOGIN ----------------
 @app.route("/login", methods=["POST"])
 def login():

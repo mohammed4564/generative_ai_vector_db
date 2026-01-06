@@ -18,7 +18,7 @@ from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from helper.jwt_request import jwt_required
 from helper.multiple_document_upload import ingest_document
-
+from helper.multiple_document_upload import delete_file_vectors
 
 # ---------------- LOAD ENV ----------------
 load_dotenv()
@@ -447,6 +447,20 @@ Question:
         "question": question,
         "answer": answer
     })
+# delete file api from vector db
+@app.route("/delete-file", methods=["POST"])
+@jwt_required
+def delete_file():
+    global vector_db
+    data = request.get_json()
+    filename = data.get("filename")
+    
+    if not filename:
+        return jsonify({"error": "filename required"}), 400
+
+    result = delete_file_vectors(filename, vector_db)
+    return jsonify(result), 200
+
 # ---------------- LOAD VECTOR DB AT STARTUP ----------------
 load_vector_db()
 
